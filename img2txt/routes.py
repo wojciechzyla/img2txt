@@ -7,6 +7,7 @@ from img2txt import app
 from img2txt.convert_to_txt import Pdf2txt, Image2text
 import os
 import cv2
+import base64
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
 
@@ -17,15 +18,18 @@ def allowed_file(filename):
 
 @app.route("/", methods=['POST'])
 def convert_image():
-    if 'file' not in request.files:
+    if 'file' not in request.json:
         message = json.dumps({"info": "No file included"})
         resp = Response(message, status=406, mimetype='application/json')
         return resp
-    file = request.files['file']
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        if file.filename.rsplit('.', 1)[1].lower() == 'pdf':
+    pdf_b64 = request.json['file']
+    file = base64.b64decode(pdf_b64.encode('utf-8'))
+    file_name = secure_filename(request.json['filename'])
+    if file and allowed_file(file_name):
+        filename = secure_filename(file_name)
+        with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), "wb") as f:
+            f.write(file)
+        if file_name.rsplit('.', 1)[1].lower() == 'pdf':
             preprocess = Pdf2txt(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         else:
             image = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], filename))
