@@ -32,6 +32,7 @@ def convert_image(user_id):
         pdf_b64 = params['file']
         file = base64.b64decode(pdf_b64.encode('utf-8'))
         file_name = secure_filename(params['filename'])
+        token = params['token']
 
         if file and allowed_file(file_name):
             filename = secure_filename(file_name)
@@ -47,6 +48,7 @@ def convert_image(user_id):
 
             message = {"file_name": f'{filename}',
                        "text": result,
+                       "token": token,
                        "status_code": 200}
             requests.post(URL_PANEL + "/" + file_name + "/" + str(user_id), json=message)
         else:
