@@ -9,8 +9,15 @@ import pytesseract
 
 
 class Image2text:
+    """
+    This class is used to convert images to text.
+    """
     def __init__(self, images: List):
+        """
+        :param images: list of images
+        """
         self.images_ = images
+        # list for storing text representation of each image
         self.texts = []
 
     def convert(self):
@@ -27,7 +34,13 @@ class Image2text:
 
 
 class Pdf2txt(Image2text):
+    """
+    This class is used to convert pdf to text.
+    """
     def __init__(self, pdf_path):
+        """
+        :param pdf_path: path to pdf file
+        """
         images = pdf2image.convert_from_path(pdf_path)
         for i in range(len(images)):
             images[i] = np.asarray(images[i])

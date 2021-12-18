@@ -26,6 +26,8 @@ def convert_image(user_id):
     data = request.get_json()
 
     def retrieve_text(**kwargs):
+        # url of panelstudenta app where results
+        # should be reutrned
         URL_PANEL = os.environ.get("URL_PANEL")
         params = kwargs.get('post_data')
 
@@ -36,14 +38,20 @@ def convert_image(user_id):
 
         if file and allowed_file(file_name):
             filename = secure_filename(file_name)
+            # temporarily save the file
             with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), "wb") as f:
                 f.write(file)
+
+            # check whether file is image or pdf and use appropriate class
             if file_name.rsplit('.', 1)[1].lower() == 'pdf':
-                preprocess = Pdf2txt(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                img2txt_object = Pdf2txt(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             else:
                 image = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                preprocess = Image2text([image])
-            result = preprocess.convert()
+                img2txt_object = Image2text([image])
+
+            result = img2txt_object.convert()
+
+            # remove saved file
             os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             message = {"file_name": f'{filename}',
@@ -56,6 +64,8 @@ def convert_image(user_id):
                        "status_code":  406}
             requests.post(URL_PANEL + "/" + file_name + "/" + str(user_id), json=message)
 
+    # Process images on different thread so that panelstudenta app doesn't have
+    # to wait long for response.
     thread = threading.Thread(target=retrieve_text, kwargs={'post_data': data})
     thread.start()
     return {"info": "accepted"}, 202
