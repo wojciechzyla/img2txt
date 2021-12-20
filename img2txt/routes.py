@@ -32,7 +32,8 @@ def convert_image(user_id):
         params = kwargs.get('post_data')
 
         pdf_b64 = params['file']
-        file = base64.b64decode(pdf_b64.encode('utf-8'))
+        file = base64.b64decode(pdf_b64.encode("utf-8"))
+        #file = params['file']
         file_name = secure_filename(params['filename'])
         token = params['token']
 
