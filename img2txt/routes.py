@@ -21,6 +21,11 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@app.route("/", methods=['GET'])
+def get_test():
+    return "Working"
+
+
 @app.route("/<user_id>", methods=['POST'])
 def convert_image(user_id):
     data = request.get_json()
