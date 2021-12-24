@@ -1,6 +1,6 @@
 FROM python:3.8-slim
 WORKDIR /img2txt
-COPY ./app /img2txt
+COPY . /img2txt
 RUN apt-get update
 RUN apt-get install poppler-utils -y
 RUN apt install tesseract-ocr -y
